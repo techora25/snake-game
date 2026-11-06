@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#05090d" />
+  <meta name="description" content="A classic Snake game built with HTML, CSS and JavaScript. Eat, grow and survive." />
+  <title>Snake Game</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23081218'/%3E%3Cpath d='M8 24h8a4 4 0 0 0 0-8h-4a4 4 0 0 1 0-8h8' fill='none' stroke='%234ade80' stroke-width='3.5' stroke-linecap='round'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none">
+            <defs>
+              <linearGradient id="brandGradient" x1="4" y1="28" x2="26" y2="4" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#16a34a" />
+                <stop offset="0.55" stop-color="#4ade80" />
+                <stop offset="1" stop-color="#d9f99d" />
+              </linearGradient>
+            </defs>
+            <path d="M9 25h9a5 5 0 0 0 0-10h-5a4 4 0 0 1 0-8h7"
+                  stroke="url(#brandGradient)" stroke-width="3.6" stroke-linecap="round" />
+            <circle cx="20.5" cy="7" r="1.6" fill="#052e16" />
+          </svg>
+        </span>
+        <div class="brand-copy">
+          <h1>Snake <span>Game</span></h1>
+          <p class="tagline">Eat &middot; Grow &middot; Survive</p>
+        </div>
+      </div>
+      <button class="icon-btn" id="soundBtn" type="button" aria-pressed="true" aria-label="Mute sound" title="Mute sound">
+        <svg class="sound-on" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 9.5h3.2L12 5.5v13L7.2 14.5H4z" fill="currentColor" />
+          <path d="M15.5 9a4.2 4.2 0 0 1 0 6M18 6.5a7.8 7.8 0 0 1 0 11"
+                fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+        <svg class="sound-off" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 9.5h3.2L12 5.5v13L7.2 14.5H4z" fill="currentColor" />
+          <path d="M15.5 9.5l5 5m0-5l-5 5"
+                fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+      </button>
+    </header>
+
+    <section class="hud" aria-label="Game statistics">
+      <div class="stat">
+        <span class="stat-label">Score</span>
+        <span class="stat-value" id="score">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Best</span>
+        <span class="stat-value" id="highScore">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Speed</span>
+        <span class="stat-value" id="level">Lv. 1</span>
+      </div>
+    </section>
+
+    <section class="board" id="board" aria-label="Snake playfield">
+      <canvas id="gameCanvas" aria-label="Snake game board" role="img">
+        Your browser does not support the canvas element needed to play this game.
+      </canvas>
+      <div class="vignette" aria-hidden="true"></div>
+
+      <div class="overlay" id="overlay" aria-live="polite">
+        <div class="overlay-card">
+          <p class="kicker" id="overlayKicker">Snake Game</p>
+          <h2 id="overlayTitle">Ready to slither?</h2>
+          <p class="overlay-text" id="overlayText">
+            Eat the glowing food, grow longer, and steer clear of the walls and your own tail.
+          </p>
+          <label class="wrap-toggle" id="wrapSettings">
+            <span class="wrap-copy">
+              <span class="wrap-name">Wrap-around walls</span>
+              <span class="wrap-desc">Cross an edge and appear on the opposite side.</span>
+            </span>
+            <input class="wrap-input" id="wrapToggle" type="checkbox" role="switch" />
+            <span class="switch" aria-hidden="true"></span>
+          </label>
+          <div class="final" id="finalWrap" hidden>
+            <span class="final-label">Final score</span>
+            <strong class="final-value" id="finalScore">0</strong>
+            <span class="final-best" id="bestNote"></span>
+          </div>
+          <button class="btn btn-primary" id="overlayBtn" type="button">Start Game</button>
+          <p class="overlay-hint" id="overlayHint">Arrow keys or WASD to steer</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="controls" aria-label="Game controls">
+      <button class="btn btn-primary" id="startBtn" type="button">
+        <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8 5.5v13l11-6.5z" fill="currentColor" />
+        </svg>
+        <span>Start Game</span>
+      </button>
+      <button class="btn" id="pauseBtn" type="button" disabled>
+        <svg class="btn-icon icon-pause" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 5h4v14H7zM14 5h4v14h-4z" fill="currentColor" />
+        </svg>
+        <svg class="btn-icon icon-play" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M8 5.5v13l11-6.5z" fill="currentColor" />
+        </svg>
+        <span id="pauseLabel">Pause</span>
+      </button>
+      <button class="btn" id="restartBtn" type="button">
+        <svg class="btn-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 5V2L7.5 5.5 12 9V6a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z" fill="currentColor" />
+        </svg>
+        <span>Restart</span>
+      </button>
+    </section>
+
+    <section class="dpad" aria-label="Touch controls">
+      <button class="dpad-btn up" type="button" data-dir="up" aria-label="Move up">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
+      </button>
+      <button class="dpad-btn left" type="button" data-dir="left" aria-label="Move left">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
+      </button>
+      <button class="dpad-btn right" type="button" data-dir="right" aria-label="Move right">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
+      </button>
+      <button class="dpad-btn down" type="button" data-dir="down" aria-label="Move down">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
+      </button>
+    </section>
+
+    <p class="hint">Arrows / WASD to move &middot; Space to pause &middot; Swipe on the board on mobile</p>
+  </div>
+
+  <script src="js/sound.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
